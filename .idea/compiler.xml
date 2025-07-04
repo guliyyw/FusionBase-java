@@ -2,12 +2,14 @@
 <project version="4">
   <component name="CompilerConfiguration">
     <annotationProcessing>
+      <profile default="true" name="Default" enabled="true" />
       <profile name="Maven default annotation processors profile" enabled="true">
         <sourceOutputDir name="target/generated-sources/annotations" />
         <sourceTestOutputDir name="target/generated-test-sources/test-annotations" />
         <outputRelativeToContentRoot value="true" />
-        <module name="common" />
+        <module name="web-user" />
         <module name="model" />
+        <module name="common" />
         <module name="web-admin" />
       </profile>
     </annotationProcessing>
@@ -18,6 +20,7 @@
       <module name="model" options="-parameters" />
       <module name="web" options="" />
       <module name="web-admin" options="-parameters" />
+      <module name="web-user" options="-parameters" />
     </option>
   </component>
 </project>

@@ -30,6 +30,8 @@ public enum ResultCodeEnum {
     ADMIN_ACCESS_FORBIDDEN(309, "无访问权限"),
 
     ADMIN_APARTMENT_DELETE_ERROR(310,"请先删除房间"),
+    ALBUM_NOT_FOUND(311, "相册不存在"),
+    PERMISSION_DENIED(312, "权限不足"),
 
     APP_LOGIN_AUTH(501, "未登陆"),
     APP_LOGIN_PHONE_EMPTY(502, "手机号码为空"),
@@ -38,10 +40,13 @@ public enum ResultCodeEnum {
     APP_LOGIN_CODE_EXPIRED(505, "验证码已过期"),
     APP_LOGIN_CODE_ERROR(506, "验证码错误"),
     APP_ACCOUNT_DISABLED_ERROR(507, "该用户已被禁用"),
-
+    USER_EMAIL_EXIST(508, "邮箱不存在"),
+    USER_NOT_EXIST(509, "用户不存在"),
+    PASSWORD_ERROR(510, "密码错误"),
 
     TOKEN_EXPIRED(601, "token过期"),
     TOKEN_INVALID(602, "token非法");
+
 
 
     private final Integer code;

@@ -26,55 +26,63 @@ FusionBase 是一个基于 Spring Boot 和 Vue.js 的全栈相册管理系统，
 MySQL 8.0+ (使用 utf8mb4 字符集)
 
 ## 项目结构
-
-### 后端结构
 ```
-backend/
-├── src/
-│   ├── main/
-│   │   ├── java/
-│   │   │   └── com/
-│   │   │       └── fusionbase/
-│   │   │           ├── config/        # 配置类(安全、Redis、Swagger等)
-│   │   │           ├── controller/    # REST控制器
-│   │   │           ├── entity/        # 数据库实体
-│   │   │           ├── mapper/        # MyBatis数据访问接口
-│   │   │           ├── service/       # 业务逻辑接口
-│   │   │           │   └── impl/      # 业务逻辑实现
-│   │   │           ├── dto/           # 数据传输对象
-│   │   │           ├── utils/         # 工具类
-│   │   │           ├── exception/     # 异常处理
-│   │   │           └── FusionBaseApplication.java # 启动类
-│   │   └── resources/
-│   │       ├── mapper/        # MyBatis XML映射文件
-│   │       ├── application.yml # 应用配置
-│   │       └── ...            
-│   └── test/                  # 测试代码
-├── pom.xml                    # Maven依赖配置
-└── Dockerfile                 # Docker容器配置
-```
-
-### 前端结构
-```
-frontend/
-├── public/                  # 静态资源
-├── src/
-│   ├── api/                 # API请求封装
-│   ├── assets/              # 静态资源(图片、CSS)
-│   ├── components/          # 可复用组件
-│   │   ├── common/          # 通用组件
-│   │   ├── album/           # 相册相关组件
-│   │   └── user/            # 用户相关组件
-│   ├── router/              # 路由配置
-│   ├── store/               # Vuex状态管理
-│   │   └── modules/         # 模块化状态
-│   ├── utils/               # 工具函数
-│   ├── views/               # 页面视图
-│   ├── App.vue              # 根组件
-│   └── main.js              # 入口文件
-├── vue.config.js            # Vue CLI配置
-├── babel.config.js          # Babel配置
-└── package.json             # 依赖配置
+FusionBase/
+├── 基础文件
+│   ├── create_database.sql    # 数据库初始化脚本
+│   ├── create_fusionbase.bat  # 项目启动脚本
+│   ├── pom.xml                # 父工程依赖配置
+│   └── readme.md              # 项目说明文档
+│
+├── .idea/                     # IDEA 项目配置文件
+├── logs/                      # 日志文件存储目录
+│   └── FusionBase/
+│       └── application.log    # 系统运行日志
+│
+├── common/                    # 通用模块（公共工具、配置）
+│   ├── pom.xml
+│   └── src/main/java/com/yu/fusionbase/common
+│       ├── constant/          # 常量定义（如 Redis 键名）
+│       ├── exception/         # 异常处理（全局异常处理器、自定义异常）
+│       ├── minio/             # MinIO 配置（连接参数、客户端配置）
+│       ├── mybatisplus/       # MyBatis-Plus 配置（自动填充、插件）
+│       ├── redis/             # Redis 配置（序列化、连接池）
+│       ├── result/            # 统一响应结果封装（Result、状态码枚举）
+│       └── utils/             # 工具类（JWT 工具、日志工具）
+│
+├── model/                     # 数据模型模块（实体类、枚举）
+│   ├── pom.xml
+│   └── src/main/java/com/yu/fusionbase/model
+│       ├── entity/            # 数据库实体类（对应表结构）
+│       │   ├── ActivityLog    # 操作日志实体
+│       │   ├── Album          # 相册实体
+│       │   ├── AlbumShare     # 相册共享实体
+│       │   ├── Media          # 媒体文件实体
+│       │   ├── User           # 用户实体
+│       │   └── BaseEntity     # 实体基类（包含公共字段如 ID、时间戳）
+│       └── enums/             # 枚举类（文件类型、邀请状态等）
+│
+└── web/                       # Web 应用模块（接口、控制器）
+    ├── web-admin/             # 管理员端接口
+    │   ├── pom.xml
+    │   └── src/main
+    │       ├── java/          # 后端代码（控制器、服务等）
+    │       └── resources/     # 配置文件（应用配置、日志配置）
+    │
+    └── web-user/              # 用户端接口
+        ├── pom.xml
+        └── src/main
+            ├── java/com/yu/fusionbase/web/user
+            │   ├── controller/ # 接口控制器（登录、相册管理等）
+            │   ├── service/    # 业务逻辑层
+            │   ├── mapper/     # 数据访问层（MyBatis 映射）
+            │   ├── vo/         # 前端展示数据模型（如登录响应 VO）
+            │   ├── custom/     # 自定义配置（拦截器、Swagger 配置）
+            │   └── ScheduleTasks/ # 定时任务
+            └── resources/      # 配置文件
+                ├── application.yml # 应用配置（端口、数据库连接等）
+                ├── logback.xml     # 日志配置
+                └── mapper/         # MyBatis 映射文件
 ```
 
 ## 核心功能
