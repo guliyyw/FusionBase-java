@@ -109,56 +109,6 @@ FusionBase/
 
 ## 数据库设计
 
-### 表结构
-```sql
-CREATE TABLE `user` (
-  `user_id` BIGINT UNSIGNED NOT NULL AUTO_INCREMENT,
-  `username` VARCHAR(64) NOT NULL,
-  `password` CHAR(60) NOT NULL,
-  `create_time` DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
-  `is_deleted` TINYINT(1) NOT NULL DEFAULT 0,
-  `delete_time` DATETIME DEFAULT NULL,
-  `permission_level` TINYINT NOT NULL DEFAULT 1,
-  PRIMARY KEY (`user_id`),
-  UNIQUE KEY `idx_username` (`username`)
-) ENGINE=InnoDB;
-
-CREATE TABLE `album` (
-  `album_id` BIGINT UNSIGNED NOT NULL AUTO_INCREMENT,
-  `create_time` DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
-  `delete_time` DATETIME DEFAULT NULL,
-  `title` VARCHAR(255) DEFAULT '未命名',
-  `file_path` VARCHAR(512) NOT NULL,
-  `thumbnail_path` VARCHAR(512) NOT NULL,
-  `file_size` BIGINT UNSIGNED NOT NULL,
-  `media_type` ENUM('image', 'video') NOT NULL DEFAULT 'image',
-  `height` SMALLINT UNSIGNED DEFAULT NULL,
-  `width` SMALLINT UNSIGNED DEFAULT NULL,
-  `is_deleted` TINYINT(1) NOT NULL DEFAULT 0,
-  PRIMARY KEY (`album_id`)
-) ENGINE=InnoDB;
-
-CREATE TABLE `user_album_relation` (
-  `relation_id` BIGINT UNSIGNED NOT NULL AUTO_INCREMENT,
-  `user_id` BIGINT UNSIGNED NOT NULL,
-  `album_id` BIGINT UNSIGNED NOT NULL,
-  `create_time` DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
-  `is_deleted` TINYINT(1) NOT NULL DEFAULT 0,
-  `delete_time` DATETIME DEFAULT NULL,
-  PRIMARY KEY (`relation_id`),
-  UNIQUE KEY `uq_user_album` (`user_id`, `album_id`),
-  FOREIGN KEY (`user_id`) REFERENCES `user` (`user_id`) ON DELETE CASCADE,
-  FOREIGN KEY (`album_id`) REFERENCES `album` (`album_id`) ON DELETE CASCADE
-) ENGINE=InnoDB;
-```
-
-### 索引优化
-```sql
-CREATE INDEX idx_user_files ON user_album_relation (user_id, is_deleted);
-CREATE INDEX idx_file_owners ON user_album_relation (album_id, is_deleted);
-CREATE INDEX idx_media_type ON album (media_type);
-```
-
 ## 核心组件职责
 
 ### 后端分层架构
