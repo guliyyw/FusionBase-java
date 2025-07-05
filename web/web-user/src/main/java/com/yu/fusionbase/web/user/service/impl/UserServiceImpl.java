@@ -76,7 +76,7 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public UserVO getCurrentUser() {
-        Long userId = getCurrentUserId();
+        String userId = getCurrentUserId();
         User user = userMapper.selectById(userId);
         if (user == null || user.getIsDeleted() != 0) {
             throw new FusionBaseException(ResultCodeEnum.USER_NOT_EXIST);
@@ -87,7 +87,7 @@ public class UserServiceImpl implements UserService {
     @Override
     @Transactional
     public UserVO updateUser(UserVO userVO) {
-        Long userId = getCurrentUserId();
+        String userId = getCurrentUserId();
         User user = userMapper.selectById(userId);
         if (user == null || user.getIsDeleted() != 0) {
             throw new FusionBaseException(ResultCodeEnum.USER_NOT_EXIST);
@@ -119,7 +119,7 @@ public class UserServiceImpl implements UserService {
         return LocalDateTime.ofInstant(date.toInstant(), ZoneId.systemDefault());
     }
 
-    private Long getCurrentUserId() {
+    private String getCurrentUserId() {
         LoginUser loginUser = LoginUserHolder.getLoginUser();
         if (loginUser == null) {
             throw new FusionBaseException(ResultCodeEnum.UNAUTHORIZED);

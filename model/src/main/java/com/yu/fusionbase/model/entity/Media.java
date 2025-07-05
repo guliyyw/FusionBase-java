@@ -17,15 +17,15 @@ public class Media extends BaseEntity {
 
     @Schema(description = "媒体ID（随机uint）")
     @TableId(value = "media_id", type = IdType.INPUT)
-    private Long mediaId;
+    private String mediaId;
 
     @Schema(description = "所属相册ID")
     @TableField(value = "album_id")
-    private Long albumId;
+    private String albumId;
 
     @Schema(description = "上传用户ID")
     @TableField(value = "user_id")
-    private Long userId;
+    private String userId;
 
     @Schema(description = "原始文件名")
     @TableField(value = "file_name")

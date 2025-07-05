@@ -52,7 +52,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
             // 3. 解析Token并设置安全上下文
             Claims claims = jwtUtil.parseToken(token);
             LoginUser loginUser = new LoginUser(
-                    claims.get("userId", Long.class),
+                    claims.get("userId", String.class),
                     claims.get("username", String.class)
             );
 

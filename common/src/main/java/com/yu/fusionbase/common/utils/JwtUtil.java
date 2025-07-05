@@ -14,7 +14,7 @@ public class JwtUtil {
 
     private static final SecretKey secretKey = Keys.hmacShaKeyFor("mM4NDPyQ4mfCYEZxakWku8wKdmtufGJU".getBytes());
 
-    public static String createToken(Long userId, String username) {
+    public static String createToken(String userId, String username) {
 
         //生成JWT
         //claim声明自定义字段

@@ -43,7 +43,7 @@ public class AlbumServiceImpl implements AlbumService {
     @Override
     @Transactional
     public AlbumVO createAlbum(AlbumCreateDTO dto) {
-        Long userId = getCurrentUserId();
+        String userId = getCurrentUserId();
 
         Album album = new Album();
         BeanUtils.copyProperties(dto, album);
@@ -56,7 +56,7 @@ public class AlbumServiceImpl implements AlbumService {
 
     @Override
     public List<AlbumVO> getUserAlbums() {
-        Long userId = getCurrentUserId();
+        String userId = getCurrentUserId();
         List<Album> albums = albumMapper.selectList(
                 new LambdaQueryWrapper<Album>()
                         .eq(Album::getUserId, userId)
@@ -68,7 +68,7 @@ public class AlbumServiceImpl implements AlbumService {
     }
 
     @Override
-    public AlbumVO getAlbumById(Long albumId) {
+    public AlbumVO getAlbumById(String albumId) {
         Album album = albumMapper.selectById(albumId);
         if (album == null || album.getIsDeleted() != 0) {
             throw new FusionBaseException(ResultCodeEnum.ALBUM_NOT_FOUND);
@@ -80,7 +80,7 @@ public class AlbumServiceImpl implements AlbumService {
 
     @Override
     @Transactional
-    public AlbumVO updateAlbum(Long albumId, AlbumCreateDTO dto) {
+    public AlbumVO updateAlbum(String albumId, AlbumCreateDTO dto) {
         Album album = albumMapper.selectById(albumId);
         if (album == null || album.getIsDeleted() != 0) {
             throw new FusionBaseException(ResultCodeEnum.ALBUM_NOT_FOUND);
@@ -94,7 +94,7 @@ public class AlbumServiceImpl implements AlbumService {
 
     @Override
     @Transactional
-    public Boolean deleteAlbum(Long albumId) {
+    public Boolean deleteAlbum(String albumId) {
         Album album = albumMapper.selectById(albumId);
         if (album == null || album.getIsDeleted() != 0) {
             throw new FusionBaseException(ResultCodeEnum.ALBUM_NOT_FOUND);
@@ -106,12 +106,12 @@ public class AlbumServiceImpl implements AlbumService {
 
         album.setIsDeleted((byte) 1);
         album.setUpdateTime(new Date());
-        return albumMapper.updateById(album) > 0;
+        return albumMapper.deleteById(album) > 0;
     }
 
     @Override
     @Transactional
-    public Boolean shareAlbum(Long albumId, AlbumShareDTO dto) {
+    public Boolean shareAlbum(String albumId, AlbumShareDTO dto) {
         Album album = albumMapper.selectById(albumId);
         if (album == null || album.getIsDeleted() != 0) {
             throw new FusionBaseException(ResultCodeEnum.ALBUM_NOT_FOUND);
@@ -144,7 +144,7 @@ public class AlbumServiceImpl implements AlbumService {
 
     @Override
     public List<AlbumVO> getSharedAlbums() {
-        Long userId = getCurrentUserId();
+        String userId = getCurrentUserId();
         List<Album> albums = albumMapper.selectSharedAlbumsByUserId(userId);
         return albums.stream()
                 .map(this::convertToVO)
@@ -170,7 +170,7 @@ public class AlbumServiceImpl implements AlbumService {
     }
 
     private void checkAlbumPermission(Album album, PermissionLevel requiredLevel) {
-        Long currentUserId = getCurrentUserId();
+        String currentUserId = getCurrentUserId();
 
         if (Objects.equals(album.getUserId(), currentUserId)) {
             return;
@@ -186,8 +186,8 @@ public class AlbumServiceImpl implements AlbumService {
         }
     }
 
-    private PermissionLevel getSharedPermission(Long albumId) {
-        Long userId = getCurrentUserId();
+    private PermissionLevel getSharedPermission(String albumId) {
+        String userId = getCurrentUserId();
         AlbumShare share = albumShareMapper.selectByAlbumAndUser(albumId, userId);
         return share != null ? share.getPermissionLevel() : null;
     }
@@ -197,7 +197,7 @@ public class AlbumServiceImpl implements AlbumService {
         return LocalDateTime.ofInstant(date.toInstant(), ZoneId.systemDefault());
     }
 
-    private Long getCurrentUserId() {
+    private String getCurrentUserId() {
         LoginUser loginUser = LoginUserHolder.getLoginUser();
         if (loginUser == null) {
             throw new FusionBaseException(ResultCodeEnum.UNAUTHORIZED);

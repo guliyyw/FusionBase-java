@@ -11,6 +11,6 @@ public interface AlbumShareMapper extends BaseMapper<AlbumShare> {
             "WHERE albumId = #{albumId} AND shared_userId = #{userId} " +
             "AND (expires_at IS NULL OR expires_at > NOW())")
     AlbumShare selectByAlbumAndUser(
-            @Param("albumId") Long albumId,
-            @Param("userId") Long userId);
+            @Param("albumId") String albumId,
+            @Param("userId") String userId);
 }

@@ -13,7 +13,7 @@ import java.time.LocalDateTime;
 public class AlbumShareDTO {
 
     @Schema(description = "被共享用户ID", example = "123")
-    private Long sharedUserId;
+    private String sharedUserId;
 
     @Email(message = "邮箱格式不正确")
     @Schema(description = "被邀请人邮箱(用于邀请未注册用户)", example = "user@example.com")

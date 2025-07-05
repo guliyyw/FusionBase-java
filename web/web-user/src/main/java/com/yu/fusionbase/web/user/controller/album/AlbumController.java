@@ -34,28 +34,28 @@ public class AlbumController {
 
     @Operation(summary = "获取相册详情", description = "根据ID获取相册详细信息")
     @GetMapping("/{id}")
-    public Result<AlbumVO> getAlbumById(@PathVariable Long id) {
+    public Result<AlbumVO> getAlbumById(@PathVariable String id) {
         return Result.ok(albumService.getAlbumById(id));
     }
 
     @Operation(summary = "更新相册信息", description = "更新相册名称和描述")
     @PutMapping("/{id}")
     public Result<AlbumVO> updateAlbum(
-            @PathVariable Long id,
+            @PathVariable String id,
             @RequestBody AlbumCreateDTO dto) {
         return Result.ok(albumService.updateAlbum(id, dto));
     }
 
     @Operation(summary = "删除相册", description = "删除指定相册（同时删除所有媒体）")
     @DeleteMapping("/{id}")
-    public Result<Boolean> deleteAlbum(@PathVariable Long id) {
+    public Result<Boolean> deleteAlbum(@PathVariable String id) {
         return Result.ok(albumService.deleteAlbum(id));
     }
 
     @Operation(summary = "共享相册", description = "将相册共享给其他用户")
     @PostMapping("/{id}/share")
     public Result<Boolean> shareAlbum(
-            @PathVariable Long id,
+            @PathVariable String id,
             @RequestBody AlbumShareDTO dto) {
         return Result.ok(albumService.shareAlbum(id, dto));
     }

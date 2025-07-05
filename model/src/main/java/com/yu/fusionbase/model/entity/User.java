@@ -18,7 +18,7 @@ public class User extends BaseEntity {
 
     @Schema(description = "用户ID（随机uint）")
     @TableId(value = "user_id", type = IdType.INPUT)
-    private Long userId;
+    private String userId;
 
     @Schema(description = "用户名", example = "john_doe")
     @TableField(value = "username")

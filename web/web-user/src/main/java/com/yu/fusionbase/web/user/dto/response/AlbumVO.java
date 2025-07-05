@@ -11,7 +11,7 @@ import java.time.LocalDateTime;
 public class AlbumVO {
 
     @Schema(description = "相册ID", example = "123")
-    private Long albumId;
+    private String albumId;
 
     @Schema(description = "相册名称", example = "我的旅行相册")
     private String name;

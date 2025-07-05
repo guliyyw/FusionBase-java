@@ -16,11 +16,11 @@ public class Album extends BaseEntity {
 
     @Schema(description = "相册ID（随机uint）")
     @TableId(value = "album_id", type = IdType.INPUT)
-    private Long albumId;
+    private String albumId;
 
     @Schema(description = "所有者用户ID")
     @TableField(value = "user_id")
-    private Long userId;
+    private String userId;
 
     @Schema(description = "相册名称", example = "我的旅行相册")
     @TableField(value = "name")
@@ -32,7 +32,7 @@ public class Album extends BaseEntity {
 
     @Schema(description = "封面图媒体ID")
     @TableField(value = "cover_media_id")
-    private Long coverMediaId;
+    private String coverMediaId;
 
     @Schema(description = "是否公开相册", example = "false")
     @TableField(value = "is_public")

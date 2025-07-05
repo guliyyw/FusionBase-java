@@ -12,13 +12,13 @@ public interface AlbumService {
 
     List<AlbumVO> getUserAlbums();
 
-    AlbumVO getAlbumById(Long albumId);
+    AlbumVO getAlbumById(String albumId);
 
-    AlbumVO updateAlbum(Long albumId, AlbumCreateDTO dto);
+    AlbumVO updateAlbum(String albumId, AlbumCreateDTO dto);
 
-    Boolean deleteAlbum(Long albumId);
+    Boolean deleteAlbum(String albumId);
 
-    Boolean shareAlbum(Long albumId, AlbumShareDTO dto);
+    Boolean shareAlbum(String albumId, AlbumShareDTO dto);
 
     List<AlbumVO> getSharedAlbums();
 }

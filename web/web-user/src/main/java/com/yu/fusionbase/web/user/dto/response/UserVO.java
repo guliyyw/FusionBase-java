@@ -10,7 +10,7 @@ import java.time.LocalDateTime;
 public class UserVO {
 
     @Schema(description = "用户ID", example = "123")
-    private Long userId;
+    private String userId;
 
     @Schema(description = "用户名", example = "john_doe")
     private String username;

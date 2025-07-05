@@ -20,7 +20,7 @@ public class SnowflakeIdGenerator implements IdGenerator {
     }
 
     @Override
-    public synchronized long nextId() {
+    public synchronized String nextId() {
         long currentTimestamp = System.currentTimeMillis();
 
         if (currentTimestamp < lastTimestamp) {
@@ -38,10 +38,10 @@ public class SnowflakeIdGenerator implements IdGenerator {
 
         lastTimestamp = currentTimestamp;
 
-        return ((currentTimestamp - 1288834974657L) << 22) 
-                | (datacenterId << 17) 
-                | (machineId << 12) 
-                | sequence;
+        return String.valueOf(((currentTimestamp - 1288834974657L) << 22)
+                | (datacenterId << 17)
+                | (machineId << 12)
+                | sequence);
     }
 
     private long tilNextMillis(long lastTimestamp) {

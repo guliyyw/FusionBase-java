@@ -16,19 +16,19 @@ public class ActivityLog extends BaseEntity {
 
     @Schema(description = "日志ID（随机uint）")
     @TableId(value = "log_id", type = IdType.INPUT)
-    private Long logId;
+    private String logId;
 
     @Schema(description = "操作用户ID")
     @TableField(value = "user_id")
-    private Long userId;
+    private String userId;
 
     @Schema(description = "相关相册ID")
     @TableField(value = "album_id")
-    private Long albumId;
+    private String albumId;
 
     @Schema(description = "相关媒体ID")
     @TableField(value = "media_id")
-    private Long mediaId;
+    private String mediaId;
 
     @Schema(description = "活动类型", example = "UPLOAD_MEDIA")
     @TableField(value = "activity_type")

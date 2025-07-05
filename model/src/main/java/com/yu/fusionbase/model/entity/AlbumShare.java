@@ -19,19 +19,19 @@ public class AlbumShare extends BaseEntity {
 
     @Schema(description = "共享ID（随机uint）")
     @TableId(value = "share_id", type = IdType.INPUT)
-    private Long shareId;
+    private String shareId;
 
     @Schema(description = "被共享的相册ID")
     @TableField(value = "album_id")
-    private Long albumId;
+    private String albumId;
 
     @Schema(description = "相册所有者ID")
     @TableField(value = "owner_user_id")
-    private Long ownerUserId;
+    private String ownerUserId;
 
     @Schema(description = "被共享的用户ID")
     @TableField(value = "shared_user_id")
-    private Long sharedUserId;
+    private String sharedUserId;
 
     @Schema(description = "权限级别")
     @TableField(value = "permission_level")
