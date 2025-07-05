@@ -28,10 +28,13 @@ public enum ResultCodeEnum {
     ADMIN_ACCOUNT_ERROR(307, "用户名或密码错误"),
     ADMIN_ACCOUNT_DISABLED_ERROR(308, "该用户已被禁用"),
     ADMIN_ACCESS_FORBIDDEN(309, "无访问权限"),
+    UNAUTHORIZED(310, "用户未认证"),
+    INVALID_USER_ID_FORMAT(311, "id格式错误"),
+    USER_NOT_IDENTIFIED(312, "无法识别的身份类型"),
 
-    ADMIN_APARTMENT_DELETE_ERROR(310,"请先删除房间"),
-    ALBUM_NOT_FOUND(311, "相册不存在"),
-    PERMISSION_DENIED(312, "权限不足"),
+    ADMIN_APARTMENT_DELETE_ERROR(313,"请先删除房间"),
+    ALBUM_NOT_FOUND(314, "相册不存在"),
+    PERMISSION_DENIED(315, "权限不足"),
 
     APP_LOGIN_AUTH(501, "未登陆"),
     APP_LOGIN_PHONE_EMPTY(502, "手机号码为空"),

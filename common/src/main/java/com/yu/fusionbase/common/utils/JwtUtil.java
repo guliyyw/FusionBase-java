@@ -4,10 +4,12 @@ import com.yu.fusionbase.common.exception.FusionBaseException;
 import com.yu.fusionbase.common.result.ResultCodeEnum;
 import io.jsonwebtoken.*;
 import io.jsonwebtoken.security.Keys;
+import org.springframework.stereotype.Component;
 
 import javax.crypto.SecretKey;
 import java.util.Date;
 
+@Component
 public class JwtUtil {
 
     private static final SecretKey secretKey = Keys.hmacShaKeyFor("mM4NDPyQ4mfCYEZxakWku8wKdmtufGJU".getBytes());
@@ -46,9 +48,5 @@ public class JwtUtil {
         } catch (JwtException e) {
             throw new FusionBaseException(ResultCodeEnum.TOKEN_INVALID);
         }
-    }
-
-    public static void main(String[] args) {
-        System.out.println(createToken(2L,"user"));
     }
 }

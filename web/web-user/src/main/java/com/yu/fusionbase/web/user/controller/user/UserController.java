@@ -26,7 +26,6 @@ public class UserController {
     @Operation(summary = "用户登录", description = "用户登录获取JWT令牌")
     @PostMapping("/login")
     public Result<String> login(@RequestBody UserLoginDTO dto) {
-        System.out.println("denglsd");
         return Result.ok(userService.login(dto));
     }
 

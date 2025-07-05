@@ -12,11 +12,11 @@ public interface AlbumService {
 
     List<AlbumVO> getUserAlbums();
 
-    AlbumVO getAlbumById(Long id);
+    AlbumVO getAlbumById(Long albumId);
 
-    AlbumVO updateAlbum(Long id, AlbumCreateDTO dto);
+    AlbumVO updateAlbum(Long albumId, AlbumCreateDTO dto);
 
-    Boolean deleteAlbum(Long id);
+    Boolean deleteAlbum(Long albumId);
 
     Boolean shareAlbum(Long albumId, AlbumShareDTO dto);
 

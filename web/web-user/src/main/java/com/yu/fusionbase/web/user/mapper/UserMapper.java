@@ -7,6 +7,6 @@ import org.apache.ibatis.annotations.Select;
 
 public interface UserMapper extends BaseMapper<User> {
 
-    @Select("SELECT COUNT(*) FROM user WHERE email = #{email} AND deleted_at IS NULL")
+    @Select("SELECT COUNT(*) FROM user WHERE email = #{email} AND is_deleted = 0")
     int countByEmail(@Param("email") String email);
 }

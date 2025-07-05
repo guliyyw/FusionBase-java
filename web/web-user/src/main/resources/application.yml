@@ -1,5 +1,11 @@
 server:
-  port: 8080
+  port: 8081
+
+app:
+  frontend:
+    url: http://localhost:8080  # 前端应用地址
+  backend:
+    url: http://localhost:8081   # 后端应用地址
 
 spring:
   datasource:

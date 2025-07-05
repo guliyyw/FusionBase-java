@@ -12,7 +12,6 @@ import java.time.LocalDateTime;
 @Schema(description = "相册共享请求DTO")
 public class AlbumShareDTO {
 
-    @NotNull(message = "被共享用户ID不能为空")
     @Schema(description = "被共享用户ID", example = "123")
     private Long sharedUserId;
 

@@ -10,7 +10,7 @@ import java.util.List;
 public interface AlbumMapper extends BaseMapper<Album> {
 
     @Select("SELECT a.* FROM album a " +
-            "JOIN album_share s ON a.id = s.album_id " +
-            "WHERE s.shared_user_id = #{userId} AND a.deleted_at IS NULL AND s.expires_at > NOW()")
+            "JOIN album_share s ON a.albumId = s.albumId " +
+            "WHERE s.shared_userId = #{userId} AND a.is_deleted = 0 AND (s.expires_at IS NULL OR s.expires_at > NOW())")
     List<Album> selectSharedAlbumsByUserId(@Param("userId") Long userId);
 }

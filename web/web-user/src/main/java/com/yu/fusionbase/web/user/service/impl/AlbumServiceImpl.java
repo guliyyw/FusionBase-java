@@ -2,9 +2,12 @@ package com.yu.fusionbase.web.user.service.impl;
 
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.yu.fusionbase.common.exception.FusionBaseException;
+import com.yu.fusionbase.common.login.LoginUser;
+import com.yu.fusionbase.common.login.LoginUserHolder;
 import com.yu.fusionbase.common.result.ResultCodeEnum;
 import com.yu.fusionbase.common.utils.JwtUtil;
-
+import com.yu.fusionbase.common.utils.IdGenerator;
+import com.yu.fusionbase.common.utils.LogUtil;
 import com.yu.fusionbase.model.entity.Album;
 import com.yu.fusionbase.model.entity.AlbumShare;
 import com.yu.fusionbase.model.entity.User;
@@ -17,10 +20,13 @@ import com.yu.fusionbase.web.user.mapper.AlbumMapper;
 import com.yu.fusionbase.web.user.mapper.AlbumShareMapper;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.BeanUtils;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
+import java.time.ZoneId;
 import java.util.Date;
 import java.util.List;
 import java.util.Objects;
@@ -32,6 +38,7 @@ public class AlbumServiceImpl implements AlbumService {
 
     private final AlbumMapper albumMapper;
     private final AlbumShareMapper albumShareMapper;
+    private final IdGenerator idGenerator;
 
     @Override
     @Transactional
@@ -41,6 +48,7 @@ public class AlbumServiceImpl implements AlbumService {
         Album album = new Album();
         BeanUtils.copyProperties(dto, album);
         album.setUserId(userId);
+        album.setAlbumId(idGenerator.nextId()); // 使用ID生成器
 
         albumMapper.insert(album);
         return convertToVO(album);
@@ -52,7 +60,7 @@ public class AlbumServiceImpl implements AlbumService {
         List<Album> albums = albumMapper.selectList(
                 new LambdaQueryWrapper<Album>()
                         .eq(Album::getUserId, userId)
-                        .isNull(Album::getIsDeleted)
+                        .eq(Album::getIsDeleted, 0)
         );
         return albums.stream()
                 .map(this::convertToVO)
@@ -60,29 +68,25 @@ public class AlbumServiceImpl implements AlbumService {
     }
 
     @Override
-    public AlbumVO getAlbumById(Long id) {
-        Album album = albumMapper.selectById(id);
-        if (album == null || album.getIsDeleted() != null) {
+    public AlbumVO getAlbumById(Long albumId) {
+        Album album = albumMapper.selectById(albumId);
+        if (album == null || album.getIsDeleted() != 0) {
             throw new FusionBaseException(ResultCodeEnum.ALBUM_NOT_FOUND);
         }
 
-        // 检查权限
         checkAlbumPermission(album, PermissionLevel.VIEWER);
-
         return convertToVO(album);
     }
 
     @Override
     @Transactional
-    public AlbumVO updateAlbum(Long id, AlbumCreateDTO dto) {
-        Album album = albumMapper.selectById(id);
-        if (album == null || album.getIsDeleted() != null) {
+    public AlbumVO updateAlbum(Long albumId, AlbumCreateDTO dto) {
+        Album album = albumMapper.selectById(albumId);
+        if (album == null || album.getIsDeleted() != 0) {
             throw new FusionBaseException(ResultCodeEnum.ALBUM_NOT_FOUND);
         }
 
-        // 检查权限（需要管理者或所有者）
         checkAlbumPermission(album, PermissionLevel.MANAGER);
-
         BeanUtils.copyProperties(dto, album);
         albumMapper.updateById(album);
         return convertToVO(album);
@@ -90,18 +94,16 @@ public class AlbumServiceImpl implements AlbumService {
 
     @Override
     @Transactional
-    public Boolean deleteAlbum(Long id) {
-        Album album = albumMapper.selectById(id);
-        if (album == null || album.getIsDeleted() != null) {
+    public Boolean deleteAlbum(Long albumId) {
+        Album album = albumMapper.selectById(albumId);
+        if (album == null || album.getIsDeleted() != 0) {
             throw new FusionBaseException(ResultCodeEnum.ALBUM_NOT_FOUND);
         }
 
-        // 只有所有者可以删除
         if (!getCurrentUserId().equals(album.getUserId())) {
             throw new FusionBaseException(ResultCodeEnum.PERMISSION_DENIED);
         }
 
-        // 软删除相册
         album.setIsDeleted((byte) 1);
         album.setUpdateTime(new Date());
         return albumMapper.updateById(album) > 0;
@@ -111,28 +113,23 @@ public class AlbumServiceImpl implements AlbumService {
     @Transactional
     public Boolean shareAlbum(Long albumId, AlbumShareDTO dto) {
         Album album = albumMapper.selectById(albumId);
-        if (album == null || album.getIsDeleted() != null) {
+        if (album == null || album.getIsDeleted() != 0) {
             throw new FusionBaseException(ResultCodeEnum.ALBUM_NOT_FOUND);
         }
 
-        // 检查当前用户是否有共享权限（必须是所有者或管理者）
         if (!getCurrentUserId().equals(album.getUserId())) {
             checkAlbumPermission(album, PermissionLevel.MANAGER);
         }
 
-        // 创建共享记录
         AlbumShare share = new AlbumShare();
+        share.setShareId(idGenerator.nextId()); // 使用ID生成器
         share.setAlbumId(albumId);
-        share.setOwnerId(album.getUserId());
+        share.setOwnerUserId(album.getUserId());
 
         if (dto.getSharedUserId() != null) {
             share.setSharedUserId(dto.getSharedUserId());
         } else if (dto.getInviteeEmail() != null) {
-            // 处理邀请未注册用户的情况
-            // 这里需要调用邀请服务，实际项目中会发送邀请邮件
-            // 此处简化处理，只记录日志
-            System.out.println("Inviting user by email: " + dto.getInviteeEmail());
-            // 设置共享用户ID为null，表示待接受邀请
+            LogUtil.info("Inviting user by email: {}", dto.getInviteeEmail());
             share.setSharedUserId(null);
         } else {
             throw new FusionBaseException(ResultCodeEnum.PARAM_ERROR);
@@ -157,37 +154,33 @@ public class AlbumServiceImpl implements AlbumService {
     private AlbumVO convertToVO(Album album) {
         AlbumVO vo = new AlbumVO();
         BeanUtils.copyProperties(album, vo);
-        vo.setAlbumId(album.getId());
+        vo.setAlbumId(album.getAlbumId());
+        vo.setCreatedTime(convertToLocalDateTime(album.getCreateTime()));
+        vo.setUpdatedTime(convertToLocalDateTime(album.getUpdateTime()));
 
-        // 设置权限
         if (Objects.equals(album.getUserId(), getCurrentUserId())) {
             vo.setPermission(PermissionLevel.MANAGER);
         } else {
-            // 查询共享权限
-            PermissionLevel permission = getSharedPermission(album.getId());
+            PermissionLevel permission = getSharedPermission(album.getAlbumId());
             vo.setPermission(permission);
         }
 
-        // 设置媒体数量（实际项目中需要查询媒体表）
         vo.setMediaCount(0);
-
         return vo;
     }
 
     private void checkAlbumPermission(Album album, PermissionLevel requiredLevel) {
         Long currentUserId = getCurrentUserId();
 
-        // 所有者拥有所有权限
         if (Objects.equals(album.getUserId(), currentUserId)) {
             return;
         }
 
-        // 公开相册允许查看
         if (album.getIsPublic() && requiredLevel == PermissionLevel.VIEWER) {
             return;
         }
 
-        PermissionLevel permission = getSharedPermission(album.getId());
+        PermissionLevel permission = getSharedPermission(album.getAlbumId());
         if (permission == null || permission.ordinal() < requiredLevel.ordinal()) {
             throw new FusionBaseException(ResultCodeEnum.PERMISSION_DENIED);
         }
@@ -199,11 +192,16 @@ public class AlbumServiceImpl implements AlbumService {
         return share != null ? share.getPermissionLevel() : null;
     }
 
-    private Long getCurrentUserId() {
-        // 从JWT中获取当前用户ID
-        // 实际项目中需要从SecurityContext获取
-        return 1L; // 简化处理，实际项目中需要实现
+    private LocalDateTime convertToLocalDateTime(Date date) {
+        if (date == null) return null;
+        return LocalDateTime.ofInstant(date.toInstant(), ZoneId.systemDefault());
     }
 
-
+    private Long getCurrentUserId() {
+        LoginUser loginUser = LoginUserHolder.getLoginUser();
+        if (loginUser == null) {
+            throw new FusionBaseException(ResultCodeEnum.UNAUTHORIZED);
+        }
+        return loginUser.getUserId();
+    }
 }

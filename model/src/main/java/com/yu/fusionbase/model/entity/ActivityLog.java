@@ -1,6 +1,8 @@
 package com.yu.fusionbase.model.entity;
 
+import com.baomidou.mybatisplus.annotation.IdType;
 import com.baomidou.mybatisplus.annotation.TableField;
+import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Data;
@@ -11,6 +13,10 @@ import lombok.EqualsAndHashCode;
 @TableName("activity_log")
 @Schema(description = "系统活动日志表")
 public class ActivityLog extends BaseEntity {
+
+    @Schema(description = "日志ID（随机uint）")
+    @TableId(value = "log_id", type = IdType.INPUT)
+    private Long logId;
 
     @Schema(description = "操作用户ID")
     @TableField(value = "user_id")

@@ -1,6 +1,8 @@
 package com.yu.fusionbase.model.entity;
 
+import com.baomidou.mybatisplus.annotation.IdType;
 import com.baomidou.mybatisplus.annotation.TableField;
+import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Data;
@@ -13,6 +15,10 @@ import java.time.LocalDateTime;
 @TableName("user")
 @Schema(description = "用户信息表")
 public class User extends BaseEntity {
+
+    @Schema(description = "用户ID（随机uint）")
+    @TableId(value = "user_id", type = IdType.INPUT)
+    private Long userId;
 
     @Schema(description = "用户名", example = "john_doe")
     @TableField(value = "username")

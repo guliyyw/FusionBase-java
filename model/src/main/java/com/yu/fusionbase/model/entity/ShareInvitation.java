@@ -1,6 +1,8 @@
 package com.yu.fusionbase.model.entity;
 
+import com.baomidou.mybatisplus.annotation.IdType;
 import com.baomidou.mybatisplus.annotation.TableField;
+import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
 import com.yu.fusionbase.model.enums.InvitationStatus;
 import com.yu.fusionbase.model.enums.PermissionLevel;
@@ -16,13 +18,17 @@ import java.time.LocalDateTime;
 @Schema(description = "相册共享邀请表")
 public class ShareInvitation extends BaseEntity {
 
+    @Schema(description = "邀请ID（随机uint）")
+    @TableId(value = "invitation_id", type = IdType.INPUT)
+    private Long invitationId;
+
     @Schema(description = "相册ID")
     @TableField(value = "album_id")
     private Long albumId;
 
     @Schema(description = "邀请人ID")
-    @TableField(value = "inviter_id")
-    private Long inviterId;
+    @TableField(value = "inviter_user_id")
+    private Long inviterUserId;
 
     @Schema(description = "被邀请人邮箱")
     @TableField(value = "invitee_email")

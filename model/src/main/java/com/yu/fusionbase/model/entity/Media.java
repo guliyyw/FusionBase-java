@@ -1,6 +1,8 @@
 package com.yu.fusionbase.model.entity;
 
+import com.baomidou.mybatisplus.annotation.IdType;
 import com.baomidou.mybatisplus.annotation.TableField;
+import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
 import com.yu.fusionbase.model.enums.FileType;
 import io.swagger.v3.oas.annotations.media.Schema;
@@ -12,6 +14,10 @@ import lombok.EqualsAndHashCode;
 @TableName("media")
 @Schema(description = "媒体文件表")
 public class Media extends BaseEntity {
+
+    @Schema(description = "媒体ID（随机uint）")
+    @TableId(value = "media_id", type = IdType.INPUT)
+    private Long mediaId;
 
     @Schema(description = "所属相册ID")
     @TableField(value = "album_id")
