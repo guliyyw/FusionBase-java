@@ -35,6 +35,7 @@ public enum ResultCodeEnum {
     ADMIN_APARTMENT_DELETE_ERROR(313,"请先删除房间"),
     ALBUM_NOT_FOUND(314, "相册不存在"),
     PERMISSION_DENIED(315, "权限不足"),
+    MEDIA_NOT_FOUND(316, "照片或视频不存在"),
 
     APP_LOGIN_AUTH(501, "未登陆"),
     APP_LOGIN_PHONE_EMPTY(502, "手机号码为空"),

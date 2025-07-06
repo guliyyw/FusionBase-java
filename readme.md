@@ -178,7 +178,7 @@ sequenceDiagram
    ```
 3. 配置MinIO对象存储:
    ```bash
-   docker run -d --name minio -p 9000:9000 -p 9090:9090 -e "MINIO_ROOT_USER=admin" -e "MINIO_ROOT_PASSWORD=admin23" quay.io/minio/minio:RELEASE.2025-04-22T22-12-26Z server /data --console-address ":9090"
+   docker run -d --name minio -p 9000:9000 -p 9090:9090 -e "MINIO_ROOT_USER=admin" -e "MINIO_ROOT_PASSWORD=admin123" quay.io/minio/minio:RELEASE.2025-04-22T22-12-26Z server /data --console-address ":9090"
    ```
 4. 修改`application.yml`中的配置
 5. 构建项目：

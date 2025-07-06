@@ -17,7 +17,7 @@ public class BaseEntity implements Serializable {
     private Date createTime;
 
     @Schema(description = "更新时间")
-    @TableField(value = "update_time", fill = FieldFill.UPDATE)
+    @TableField(value = "update_time", fill = FieldFill.INSERT_UPDATE)
     @JsonIgnore
     private Date updateTime;
 

@@ -10,7 +10,7 @@ app:
 spring:
   datasource:
     type: com.zaxxer.hikari.HikariDataSource
-    url: jdbc:mysql://127.0.0.1:3306/fusion_base?useUnicode=true&characterEncoding=utf-8&useSSL=false&allowPublicKeyRetrieval=true&serverTimezone=GMT%2b8
+    url: jdbc:mysql://127.0.0.1:3306/fusion_base?serverTimezone=Asia/Shanghai&useUnicode=true&characterEncoding=utf-8&useSSL=false&allowPublicKeyRetrieval=true&serverTimezone=GMT%2b8
     username: root
     password: root
     hikari:
@@ -33,6 +33,12 @@ spring:
 mybatis-plus:
   configuration:
     log-impl: org.apache.ibatis.logging.stdout.StdOutImpl
+
+minio:
+  endpoint: http://127.0.0.1:9000
+  access-key: fusionbase
+  secret-key: fusionbase
+  bucket-name: fusionbase
 
 springdoc:
   default-flat-param-object: true

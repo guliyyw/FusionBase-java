@@ -1,6 +1,7 @@
 package com.yu.fusionbase.common.mybatisplus;
 
 import com.baomidou.mybatisplus.core.handlers.MetaObjectHandler;
+import com.yu.fusionbase.common.utils.LogUtil;
 import org.apache.ibatis.reflection.MetaObject;
 import org.springframework.stereotype.Component;
 

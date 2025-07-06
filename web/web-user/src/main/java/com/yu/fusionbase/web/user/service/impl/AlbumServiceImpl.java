@@ -2,26 +2,22 @@ package com.yu.fusionbase.web.user.service.impl;
 
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.yu.fusionbase.common.exception.FusionBaseException;
-import com.yu.fusionbase.common.login.LoginUser;
-import com.yu.fusionbase.common.login.LoginUserHolder;
 import com.yu.fusionbase.common.result.ResultCodeEnum;
-import com.yu.fusionbase.common.utils.JwtUtil;
 import com.yu.fusionbase.common.utils.IdGenerator;
 import com.yu.fusionbase.common.utils.LogUtil;
 import com.yu.fusionbase.model.entity.Album;
 import com.yu.fusionbase.model.entity.AlbumShare;
-import com.yu.fusionbase.model.entity.User;
 import com.yu.fusionbase.model.enums.PermissionLevel;
 import com.yu.fusionbase.web.user.dto.request.AlbumCreateDTO;
 import com.yu.fusionbase.web.user.dto.request.AlbumShareDTO;
 import com.yu.fusionbase.web.user.dto.response.AlbumVO;
+import com.yu.fusionbase.web.user.mapper.MediaMapper;
 import com.yu.fusionbase.web.user.service.AlbumService;
 import com.yu.fusionbase.web.user.mapper.AlbumMapper;
 import com.yu.fusionbase.web.user.mapper.AlbumShareMapper;
+import com.yu.fusionbase.web.user.utils.Util;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.BeanUtils;
-import org.springframework.security.core.Authentication;
-import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -38,17 +34,19 @@ public class AlbumServiceImpl implements AlbumService {
 
     private final AlbumMapper albumMapper;
     private final AlbumShareMapper albumShareMapper;
+    private final MediaMapper mediaMapper;
     private final IdGenerator idGenerator;
 
     @Override
     @Transactional
     public AlbumVO createAlbum(AlbumCreateDTO dto) {
-        String userId = getCurrentUserId();
+        String userId = Util.getCurrentUserId();
 
         Album album = new Album();
         BeanUtils.copyProperties(dto, album);
         album.setUserId(userId);
         album.setAlbumId(idGenerator.nextId()); // 使用ID生成器
+        album.setUpdateTime(new Date());
 
         albumMapper.insert(album);
         return convertToVO(album);
@@ -56,7 +54,7 @@ public class AlbumServiceImpl implements AlbumService {
 
     @Override
     public List<AlbumVO> getUserAlbums() {
-        String userId = getCurrentUserId();
+        String userId = Util.getCurrentUserId();
         List<Album> albums = albumMapper.selectList(
                 new LambdaQueryWrapper<Album>()
                         .eq(Album::getUserId, userId)
@@ -88,6 +86,7 @@ public class AlbumServiceImpl implements AlbumService {
 
         checkAlbumPermission(album, PermissionLevel.MANAGER);
         BeanUtils.copyProperties(dto, album);
+
         albumMapper.updateById(album);
         return convertToVO(album);
     }
@@ -100,12 +99,10 @@ public class AlbumServiceImpl implements AlbumService {
             throw new FusionBaseException(ResultCodeEnum.ALBUM_NOT_FOUND);
         }
 
-        if (!getCurrentUserId().equals(album.getUserId())) {
+        if (!Util.getCurrentUserId().equals(album.getUserId())) {
             throw new FusionBaseException(ResultCodeEnum.PERMISSION_DENIED);
         }
 
-        album.setIsDeleted((byte) 1);
-        album.setUpdateTime(new Date());
         return albumMapper.deleteById(album) > 0;
     }
 
@@ -117,7 +114,7 @@ public class AlbumServiceImpl implements AlbumService {
             throw new FusionBaseException(ResultCodeEnum.ALBUM_NOT_FOUND);
         }
 
-        if (!getCurrentUserId().equals(album.getUserId())) {
+        if (!Util.getCurrentUserId().equals(album.getUserId())) {
             checkAlbumPermission(album, PermissionLevel.MANAGER);
         }
 
@@ -144,7 +141,7 @@ public class AlbumServiceImpl implements AlbumService {
 
     @Override
     public List<AlbumVO> getSharedAlbums() {
-        String userId = getCurrentUserId();
+        String userId = Util.getCurrentUserId();
         List<Album> albums = albumMapper.selectSharedAlbumsByUserId(userId);
         return albums.stream()
                 .map(this::convertToVO)
@@ -158,19 +155,20 @@ public class AlbumServiceImpl implements AlbumService {
         vo.setCreatedTime(convertToLocalDateTime(album.getCreateTime()));
         vo.setUpdatedTime(convertToLocalDateTime(album.getUpdateTime()));
 
-        if (Objects.equals(album.getUserId(), getCurrentUserId())) {
+        if (Objects.equals(album.getUserId(), Util.getCurrentUserId())) {
             vo.setPermission(PermissionLevel.MANAGER);
         } else {
             PermissionLevel permission = getSharedPermission(album.getAlbumId());
             vo.setPermission(permission);
         }
+        int count = mediaMapper.countByAlbumId(album.getAlbumId());
+        vo.setMediaCount(count);
 
-        vo.setMediaCount(0);
         return vo;
     }
 
     private void checkAlbumPermission(Album album, PermissionLevel requiredLevel) {
-        String currentUserId = getCurrentUserId();
+        String currentUserId = Util.getCurrentUserId();
 
         if (Objects.equals(album.getUserId(), currentUserId)) {
             return;
@@ -187,7 +185,7 @@ public class AlbumServiceImpl implements AlbumService {
     }
 
     private PermissionLevel getSharedPermission(String albumId) {
-        String userId = getCurrentUserId();
+        String userId = Util.getCurrentUserId();
         AlbumShare share = albumShareMapper.selectByAlbumAndUser(albumId, userId);
         return share != null ? share.getPermissionLevel() : null;
     }
@@ -195,13 +193,5 @@ public class AlbumServiceImpl implements AlbumService {
     private LocalDateTime convertToLocalDateTime(Date date) {
         if (date == null) return null;
         return LocalDateTime.ofInstant(date.toInstant(), ZoneId.systemDefault());
-    }
-
-    private String getCurrentUserId() {
-        LoginUser loginUser = LoginUserHolder.getLoginUser();
-        if (loginUser == null) {
-            throw new FusionBaseException(ResultCodeEnum.UNAUTHORIZED);
-        }
-        return loginUser.getUserId();
     }
 }

@@ -1,5 +1,7 @@
 package com.yu.fusionbase.web.user.service;
 
+import com.baomidou.mybatisplus.extension.service.IService;
+import com.yu.fusionbase.model.entity.Album;
 import com.yu.fusionbase.web.user.dto.request.AlbumCreateDTO;
 import com.yu.fusionbase.web.user.dto.request.AlbumShareDTO;
 import com.yu.fusionbase.web.user.dto.response.AlbumVO;

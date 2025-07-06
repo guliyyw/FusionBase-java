@@ -2,8 +2,6 @@ package com.yu.fusionbase.web.user.service.impl;
 
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.yu.fusionbase.common.exception.FusionBaseException;
-import com.yu.fusionbase.common.login.LoginUser;
-import com.yu.fusionbase.common.login.LoginUserHolder;
 import com.yu.fusionbase.common.result.ResultCodeEnum;
 import com.yu.fusionbase.common.utils.JwtUtil;
 import com.yu.fusionbase.common.utils.IdGenerator;
@@ -13,10 +11,9 @@ import com.yu.fusionbase.web.user.dto.request.UserLoginDTO;
 import com.yu.fusionbase.web.user.dto.response.UserVO;
 import com.yu.fusionbase.web.user.service.UserService;
 import com.yu.fusionbase.common.utils.CustomPasswordEncoderUtil;
+import com.yu.fusionbase.web.user.utils.Util;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.BeanUtils;
-import org.springframework.security.core.Authentication;
-import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -76,7 +73,7 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public UserVO getCurrentUser() {
-        String userId = getCurrentUserId();
+        String userId = Util.getCurrentUserId();
         User user = userMapper.selectById(userId);
         if (user == null || user.getIsDeleted() != 0) {
             throw new FusionBaseException(ResultCodeEnum.USER_NOT_EXIST);
@@ -87,7 +84,7 @@ public class UserServiceImpl implements UserService {
     @Override
     @Transactional
     public UserVO updateUser(UserVO userVO) {
-        String userId = getCurrentUserId();
+        String userId = Util.getCurrentUserId();
         User user = userMapper.selectById(userId);
         if (user == null || user.getIsDeleted() != 0) {
             throw new FusionBaseException(ResultCodeEnum.USER_NOT_EXIST);
@@ -117,13 +114,5 @@ public class UserServiceImpl implements UserService {
     private LocalDateTime convertToLocalDateTime(Date date) {
         if (date == null) return null;
         return LocalDateTime.ofInstant(date.toInstant(), ZoneId.systemDefault());
-    }
-
-    private String getCurrentUserId() {
-        LoginUser loginUser = LoginUserHolder.getLoginUser();
-        if (loginUser == null) {
-            throw new FusionBaseException(ResultCodeEnum.UNAUTHORIZED);
-        }
-        return loginUser.getUserId();
     }
 }
