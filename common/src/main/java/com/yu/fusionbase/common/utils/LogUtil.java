@@ -49,6 +49,10 @@ public final class LogUtil {
         getLogger().error(msg, t);
     }
 
+    public static void error(String msg, Object... args) {
+        getLogger().error(msg, args);
+    }
+
     // 带参数的日志方法（避免字符串拼接开销）
     public static void info(String format, Object... args) {
         getLogger().info(format, args);

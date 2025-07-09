@@ -4,6 +4,7 @@ import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 import com.yu.fusionbase.model.entity.Media;
 import org.apache.ibatis.annotations.Param;
 import org.apache.ibatis.annotations.Select;
+import org.apache.ibatis.annotations.Update;
 
 import java.util.List;
 
@@ -19,4 +20,7 @@ public interface MediaMapper extends BaseMapper<Media> {
         ORDER BY create_time DESC 
     """)
     List<Media> selectByAlbumId(String albumId);
+
+    @Update("UPDATE media SET thumbnail_path = #{thumbnailPath} WHERE media_id = #{mediaId}")
+    int updateThumbnailPath(@Param("mediaId") String mediaId, @Param("thumbnailPath") String thumbnailPath);
 }

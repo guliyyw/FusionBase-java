@@ -23,6 +23,10 @@ spring:
       pool-name: SPHHikariPool # 连接池名称
   jackson:
     time-zone: GMT+8
+  servlet:
+    multipart:
+      max-file-size: 10240MB
+      max-request-size: 10240MB
   data:
     redis:
       host: 127.0.0.1

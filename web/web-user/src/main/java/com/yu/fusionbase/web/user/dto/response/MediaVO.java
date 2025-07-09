@@ -1,8 +1,10 @@
 package com.yu.fusionbase.web.user.dto.response;
 
+import com.yu.fusionbase.model.enums.FileType;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Data;
 import java.time.LocalDateTime;
+import java.util.Date;
 
 @Data
 @Schema(description = "媒体视图对象")
@@ -21,7 +23,7 @@ public class MediaVO {
     private String fileName;
 
     @Schema(description = "文件类型（image/video）", example = "image")
-    private String fileType;
+    private FileType fileType;
 
     @Schema(description = "文件大小（字节）", example = "204800")
     private Long fileSize;
@@ -42,8 +44,8 @@ public class MediaVO {
     private String thumbnailUrl;
 
     @Schema(description = "创建时间", example = "2023-07-15T10:30:00")
-    private LocalDateTime createTime;
+    private Date createTime;
 
     @Schema(description = "更新时间", example = "2023-07-15T10:35:00")
-    private LocalDateTime updateTime;
+    private Date updateTime;
 }
