@@ -7,6 +7,7 @@ import com.yu.fusionBase.common.utils.IdGenerator;
 import com.yu.fusionBase.common.utils.LogUtil;
 import com.yu.fusionBase.model.entity.Album;
 import com.yu.fusionBase.model.entity.AlbumShare;
+import com.yu.fusionBase.model.entity.Media;
 import com.yu.fusionBase.model.enums.PermissionLevel;
 import com.yu.fusionBase.web.user.dto.request.AlbumCreateDTO;
 import com.yu.fusionBase.web.user.dto.request.AlbumShareDTO;
@@ -102,7 +103,9 @@ public class AlbumServiceImpl implements AlbumService {
         if (!Util.getCurrentUserId().equals(album.getUserId())) {
             throw new FusionBaseException(ResultCodeEnum.PERMISSION_DENIED);
         }
-
+        LambdaQueryWrapper<Media> mediaLambdaQueryWrapper = new LambdaQueryWrapper<>();
+        mediaLambdaQueryWrapper.eq(Media::getAlbumId,albumId);
+        mediaMapper.delete(mediaLambdaQueryWrapper);
         return albumMapper.deleteById(album) > 0;
     }
 

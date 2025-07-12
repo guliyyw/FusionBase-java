@@ -36,7 +36,7 @@ spring:
 #用于打印框架生成的sql语句，便于调试
 mybatis-plus:
   configuration:
-    log-impl: org.apache.ibatis.logging.stdout.StdOutImpl
+    log-impl: org.apache.ibatis.logging.slf4j.Slf4jImpl
 
 minio:
   endpoint: http://127.0.0.1:9000

@@ -5,9 +5,11 @@ import com.yu.fusionBase.model.entity.Media;
 import org.apache.ibatis.annotations.Param;
 import org.apache.ibatis.annotations.Select;
 import org.apache.ibatis.annotations.Update;
+import org.springframework.stereotype.Component;
 
 import java.util.List;
 
+@Component
 public interface MediaMapper extends BaseMapper<Media> {
 
     @Select("SELECT COUNT(*) FROM fusion_base.media WHERE album_id = #{albumId} AND is_deleted = 0")
@@ -23,4 +25,5 @@ public interface MediaMapper extends BaseMapper<Media> {
 
     @Update("UPDATE media SET thumbnail_path = #{thumbnailPath} WHERE media_id = #{mediaId}")
     int updateThumbnailPath(@Param("mediaId") String mediaId, @Param("thumbnailPath") String thumbnailPath);
+
 }
