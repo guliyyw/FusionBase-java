@@ -178,7 +178,7 @@ sequenceDiagram
    ```
 3. 配置MinIO对象存储:
    ```bash
-   docker run -d --name minio -p 9000:9000 -p 9090:9090 -e "MINIO_ROOT_USER=admin" -e "MINIO_ROOT_PASSWORD=admin123" quay.io/minio/minio:RELEASE.2025-04-22T22-12-26Z server /data --console-address ":9090"
+   docker run -d --name minio -p 9000:9000 -p 9090:9090 -e "MINIO_ROOT_USER=admin" -e "MINIO_ROOT_PASSWORD=admin123" -v E:\data\minio:/data quay.io/minio/minio:RELEASE.2025-04-22T22-12-26Z server /data --console-address ":9090"   
    ```
 4. 修改`application.yml`中的配置
 5. 构建项目：
@@ -188,7 +188,7 @@ sequenceDiagram
    ```
 6. 运行项目：
    ```bash
-   java -jar target/fusionbase-backend-1.0.0.jar
+   java -jar target/fusionBase-backend-1.0.0.jar
    ```
 
 ### 前端部署
@@ -210,10 +210,10 @@ sequenceDiagram
 ### Docker部署
 ```bash
 # 构建后端镜像
-docker build -t fusionbase-backend backend/
+docker build -t fusionBase-backend backend/
 
 # 构建前端镜像
-docker build -t fusionbase-frontend frontend/
+docker build -t fusionBase-frontend frontend/
 
 # 启动服务
 docker-compose up -d

@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.yu.fusionBase.web.user.mapper.AlbumMapper">
+
+    <select id="selectSharedAlbumsByUserId" resultType="com.yu.fusionBase.model.entity.Album">
+        select *
+        from album a
+        join album_share s
+        on a.album_id = s.album_id
+        where s.shared_user_id = #{id}
+          and s.is_deleted = 0
+        and (s.expires_at is null or s.expires_at > NOW())
+    </select>
+</mapper>

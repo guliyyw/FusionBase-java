@@ -52,7 +52,7 @@
 
     <!-- 开发环境 -->
     <springProfile name="dev">
-        <logger name="com.yu.fusionbase" level="DEBUG"/> <!-- 开发环境可调高日志级别 -->
+        <logger name="com.yu.fusionBase" level="DEBUG"/> <!-- 开发环境可调高日志级别 -->
         <root level="INFO">
             <appender-ref ref="CONSOLE"/>
             <appender-ref ref="FILE"/>

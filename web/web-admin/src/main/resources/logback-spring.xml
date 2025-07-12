@@ -51,7 +51,7 @@
 
     <!-- 根据环境配置日志级别 -->
     <springProfile name="dev">
-        <logger name="com.yu.fusionbase" level="DEBUG"/>
+        <logger name="com.yu.fusionBase" level="DEBUG"/>
         <root level="INFO">
             <appender-ref ref="CONSOLE"/>
         </root>
