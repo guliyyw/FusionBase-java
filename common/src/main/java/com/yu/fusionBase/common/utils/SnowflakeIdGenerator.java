@@ -24,7 +24,7 @@ public class SnowflakeIdGenerator implements IdGenerator {
         long currentTimestamp = System.currentTimeMillis();
 
         if (currentTimestamp < lastTimestamp) {
-            throw new RuntimeException("Clock moved backwards. Refusing to generate id");
+            throw new RuntimeException("时钟回拨。拒绝生成ID");
         }
 
         if (currentTimestamp == lastTimestamp) {

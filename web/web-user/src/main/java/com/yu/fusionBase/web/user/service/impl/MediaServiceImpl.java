@@ -1,11 +1,12 @@
 package com.yu.fusionBase.web.user.service.impl;
 
+import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
+import com.yu.fusionBase.common.exception.FusionBaseException;
 import com.yu.fusionBase.common.minio.MinioProperties;
 import com.yu.fusionBase.common.utils.IdGenerator;
 import com.yu.fusionBase.common.utils.LogUtil;
 import com.yu.fusionBase.model.entity.Media;
 import com.yu.fusionBase.model.enums.FileType;
-import com.yu.fusionBase.web.user.dto.request.MediaUploadDTO;
 import com.yu.fusionBase.web.user.dto.response.MediaVO;
 import com.yu.fusionBase.web.user.mapper.MediaMapper;
 import com.yu.fusionBase.web.user.service.AlbumService;
@@ -15,6 +16,7 @@ import io.minio.*;
 import io.minio.errors.*;
 import io.minio.http.Method;
 import jakarta.servlet.http.HttpServletResponse;
+import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
@@ -46,7 +48,7 @@ import java.util.stream.Collectors;
 @Slf4j
 @Service
 @RequiredArgsConstructor
-public class MediaServiceImpl implements MediaService {
+public class MediaServiceImpl extends ServiceImpl<MediaMapper,Media> implements MediaService {
 
     private final MinioClient minioClient;
     private final MinioProperties minioProperties;
@@ -61,10 +63,8 @@ public class MediaServiceImpl implements MediaService {
     private static final String THUMB_SUFFIX = "_thumb";
     private static final String VIDEO_THUMBNAIL_FORMAT = "jpg";
 
-    private static final int PART_EXPIRY_SECONDS = 24 * 60 * 60; // 分片URL有效期24小时
-
     @Override
-    public MediaVO uploadMedia(String albumId, MultipartFile file, MediaUploadDTO dto) throws IOException, ServerException, InsufficientDataException, ErrorResponseException, NoSuchAlgorithmException, InvalidKeyException, InvalidResponseException, XmlParserException, InternalException {
+    public MediaVO uploadMedia(String albumId, MultipartFile file) throws IOException, ServerException, InsufficientDataException, ErrorResponseException, NoSuchAlgorithmException, InvalidKeyException, InvalidResponseException, XmlParserException, InternalException {
         albumService.getAlbumById(albumId);
 
         String userId = Util.getCurrentUserId();
@@ -103,7 +103,6 @@ public class MediaServiceImpl implements MediaService {
         Integer duration = thumbnailInfo.getDuration() != null ? thumbnailInfo.getDuration() : 0;
 
         Media media = new Media();
-        BeanUtils.copyProperties(dto, media);
         media.setMediaId(mediaId);
         media.setAlbumId(albumId);
         media.setUserId(currentUserId);
@@ -115,7 +114,7 @@ public class MediaServiceImpl implements MediaService {
         media.setFileSize(file.getSize());
         media.setUpdateTime(new Date());
 
-        mediaMapper.insert(media);
+        save(media);
 
         return convertToVO(media);
     }
@@ -159,14 +158,15 @@ public class MediaServiceImpl implements MediaService {
             return false;
         }
 
-        return mediaMapper.deleteById(media) > 0;
+        return removeById(mediaId);
     }
 
     @Override
     public List<MediaVO> getAlbumMedia(String albumId) {
-        List<Media> mediaList = mediaMapper.selectByAlbumId(albumId);
-
-        // 2. 转换为VO列表
+        // 使用MyBatis-Plus的lambda查询
+        List<Media> mediaList = lambdaQuery()
+                .eq(Media::getAlbumId, albumId)
+                .list();
         return mediaList.stream()
                 .map(this::convertToVO)
                 .collect(Collectors.toList());
@@ -185,7 +185,7 @@ public class MediaServiceImpl implements MediaService {
     }
 
     private String getFileUrl(String objectName) throws ServerException, InsufficientDataException, ErrorResponseException, IOException, NoSuchAlgorithmException, InvalidKeyException, InvalidResponseException, XmlParserException, InternalException {
-        String url = minioClient.getPresignedObjectUrl(
+        return minioClient.getPresignedObjectUrl(
                 GetPresignedObjectUrlArgs.builder()
                         .method(Method.GET)
                         .bucket(minioProperties.getBucketName())
@@ -193,7 +193,6 @@ public class MediaServiceImpl implements MediaService {
                         .expiry(7, TimeUnit.DAYS)  // 7天有效期
                         .build()
         );
-        return url;
     }
 
     /**
@@ -201,8 +200,6 @@ public class MediaServiceImpl implements MediaService {
      */
     public ThumbnailInfo generateThumbnail(String mediaId, InputStream thumbStream, String contentType, String objectName, String extension) {
         try {
-            String thumbnailPath = "";
-
             if (isImage(contentType)) {
                 return generateImageThumbnail(thumbStream, objectName, extension);
             } else if (isVideo(contentType)) {
@@ -389,8 +386,10 @@ public class MediaServiceImpl implements MediaService {
         return contentType != null && contentType.startsWith("video/");
     }
 
-    // 内部静态类或单独的DTO类
+    // 内部静态类
+    @Getter
     public static class ThumbnailInfo {
+        // getter和setter
         private String thumbnailPath; // 缩略图路径
         private Integer duration; // 视频时长（毫秒，图片为null）
 
@@ -399,8 +398,5 @@ public class MediaServiceImpl implements MediaService {
             this.duration = duration;
         }
 
-        // getter和setter
-        public String getThumbnailPath() { return thumbnailPath; }
-        public Integer getDuration() { return duration; }
     }
 }

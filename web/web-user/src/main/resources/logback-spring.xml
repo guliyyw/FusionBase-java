@@ -45,7 +45,7 @@
     </appender>
 
     <!-- 添加默认环境配置（无profile时） -->
-    <root level="INFO">
+    <root level="DEBUG">
         <appender-ref ref="CONSOLE"/>
         <appender-ref ref="FILE"/>
         <appender-ref ref="ERROR_FILE"/>

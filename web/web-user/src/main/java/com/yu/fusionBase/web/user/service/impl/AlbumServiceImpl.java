@@ -1,6 +1,8 @@
 package com.yu.fusionBase.web.user.service.impl;
 
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
+import com.baomidou.mybatisplus.core.conditions.update.LambdaUpdateWrapper;
+import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.yu.fusionBase.common.exception.FusionBaseException;
 import com.yu.fusionBase.common.result.ResultCodeEnum;
 import com.yu.fusionBase.common.utils.IdGenerator;
@@ -31,7 +33,7 @@ import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
-public class AlbumServiceImpl implements AlbumService {
+public class AlbumServiceImpl extends ServiceImpl<AlbumMapper, Album> implements AlbumService {
 
     private final AlbumMapper albumMapper;
     private final AlbumShareMapper albumShareMapper;
@@ -42,24 +44,22 @@ public class AlbumServiceImpl implements AlbumService {
     @Transactional
     public AlbumVO createAlbum(AlbumCreateDTO dto) {
         String userId = Util.getCurrentUserId();
-
         Album album = new Album();
         BeanUtils.copyProperties(dto, album);
         album.setUserId(userId);
-        album.setAlbumId(idGenerator.nextId()); // 使用ID生成器
-        album.setUpdateTime(new Date());
+        album.setAlbumId(idGenerator.nextId());
 
-        albumMapper.insert(album);
+        // 使用MyBatis Plus的save方法
+        saveOrUpdate(album);
         return convertToVO(album);
     }
 
     @Override
     public List<AlbumVO> getUserAlbums() {
         String userId = Util.getCurrentUserId();
-        List<Album> albums = albumMapper.selectList(
-                new LambdaQueryWrapper<Album>()
-                        .eq(Album::getUserId, userId)
-                        .eq(Album::getIsDeleted, 0)
+        List<Album> albums = list(new LambdaQueryWrapper<Album>()
+                .eq(Album::getUserId, userId)
+                .eq(Album::getIsDeleted, 0)
         );
         return albums.stream()
                 .map(this::convertToVO)
@@ -68,11 +68,11 @@ public class AlbumServiceImpl implements AlbumService {
 
     @Override
     public AlbumVO getAlbumById(String albumId) {
-        Album album = albumMapper.selectById(albumId);
-        if (album == null || album.getIsDeleted() != 0) {
+        // 使用getById方法（自动过滤逻辑删除）
+        Album album = getById(albumId);
+        if (album == null) {
             throw new FusionBaseException(ResultCodeEnum.ALBUM_NOT_FOUND);
         }
-
         checkAlbumPermission(album, PermissionLevel.VIEWER);
         return convertToVO(album);
     }
@@ -80,39 +80,42 @@ public class AlbumServiceImpl implements AlbumService {
     @Override
     @Transactional
     public AlbumVO updateAlbum(String albumId, AlbumCreateDTO dto) {
-        Album album = albumMapper.selectById(albumId);
-        if (album == null || album.getIsDeleted() != 0) {
+        Album album = getById(albumId);
+        if (album == null) {
             throw new FusionBaseException(ResultCodeEnum.ALBUM_NOT_FOUND);
         }
-
         checkAlbumPermission(album, PermissionLevel.MANAGER);
         BeanUtils.copyProperties(dto, album);
 
-        albumMapper.updateById(album);
+        saveOrUpdate(album);
+        //updateById(album);
         return convertToVO(album);
     }
 
     @Override
     @Transactional
     public Boolean deleteAlbum(String albumId) {
-        Album album = albumMapper.selectById(albumId);
-        if (album == null || album.getIsDeleted() != 0) {
+        Album album = getById(albumId);
+        if (album == null) {
             throw new FusionBaseException(ResultCodeEnum.ALBUM_NOT_FOUND);
         }
-
         if (!Util.getCurrentUserId().equals(album.getUserId())) {
             throw new FusionBaseException(ResultCodeEnum.PERMISSION_DENIED);
         }
-        LambdaQueryWrapper<Media> mediaLambdaQueryWrapper = new LambdaQueryWrapper<>();
-        mediaLambdaQueryWrapper.eq(Media::getAlbumId,albumId);
-        mediaMapper.delete(mediaLambdaQueryWrapper);
-        return albumMapper.deleteById(album) > 0;
+
+        // 逻辑删除媒体
+        LambdaUpdateWrapper<Media> mediaWrapper = new LambdaUpdateWrapper<>();
+        mediaWrapper.eq(Media::getAlbumId, albumId)
+                .set(Media::getIsDeleted, 1);
+        mediaMapper.update(null, mediaWrapper);
+
+        return removeById(albumId);
     }
 
     @Override
     @Transactional
     public Boolean shareAlbum(String albumId, AlbumShareDTO dto) {
-        Album album = albumMapper.selectById(albumId);
+        Album album = getById(albumId);
         if (album == null || album.getIsDeleted() != 0) {
             throw new FusionBaseException(ResultCodeEnum.ALBUM_NOT_FOUND);
         }

@@ -12,18 +12,8 @@ import java.util.List;
 @Component
 public interface MediaMapper extends BaseMapper<Media> {
 
-    @Select("SELECT COUNT(*) FROM fusion_base.media WHERE album_id = #{albumId} AND is_deleted = 0")
     int countByAlbumId(@Param("albumId") String albumId);
 
-    @Select("""
-        SELECT * FROM fusion_base.media 
-             WHERE album_id = #{albumId}
-                AND is_deleted = 0
-        ORDER BY create_time DESC 
-    """)
-    List<Media> selectByAlbumId(String albumId);
-
-    @Update("UPDATE media SET thumbnail_path = #{thumbnailPath} WHERE media_id = #{mediaId}")
-    int updateThumbnailPath(@Param("mediaId") String mediaId, @Param("thumbnailPath") String thumbnailPath);
+    List<Media> selectByAlbumId(@Param("albumId") String albumId);
 
 }

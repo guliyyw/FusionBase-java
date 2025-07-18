@@ -1,6 +1,5 @@
 package com.yu.fusionBase.web.user.controller.media;
 
-import com.yu.fusionBase.web.user.dto.request.MediaUploadDTO;
 import com.yu.fusionBase.web.user.dto.response.MediaVO;
 import com.yu.fusionBase.web.user.service.MediaService;
 import io.minio.errors.*;
@@ -30,9 +29,8 @@ public class MediaController {
     @PostMapping(value = "/upload/{albumId}", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public MediaVO uploadMedia(
             @PathVariable @Parameter(description = "相册ID", required = true) String albumId,
-            @RequestPart @Parameter(description = "媒体文件", required = true) MultipartFile file,
-            @RequestPart MediaUploadDTO dto) throws ServerException, InsufficientDataException, ErrorResponseException, IOException, NoSuchAlgorithmException, InvalidKeyException, InvalidResponseException, XmlParserException, InternalException {
-        return mediaService.uploadMedia(albumId, file, dto);
+            @RequestPart @Parameter(description = "媒体文件", required = true) MultipartFile file) throws ServerException, InsufficientDataException, ErrorResponseException, IOException, NoSuchAlgorithmException, InvalidKeyException, InvalidResponseException, XmlParserException, InternalException {
+        return mediaService.uploadMedia(albumId, file);
     }
 
     @Operation(summary = "下载媒体文件", description = "根据媒体ID下载文件内容")

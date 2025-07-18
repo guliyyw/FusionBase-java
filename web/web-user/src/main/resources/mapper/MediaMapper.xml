@@ -5,4 +5,17 @@
 <mapper namespace="com.yu.fusionBase.web.user.mapper.MediaMapper">
 
 
+    <select id="selectByAlbumId" resultType="com.yu.fusionBase.model.entity.Media">
+        SELECT *
+        FROM fusion_base.media
+        WHERE album_id = #{albumId}
+          AND is_deleted = 0
+        ORDER BY create_time DESC
+    </select>
+    <select id="countByAlbumId" resultType="java.lang.Integer">
+        SELECT COUNT(*)
+        FROM fusion_base.media
+        WHERE album_id = #{albumId}
+          AND is_deleted = 0
+    </select>
 </mapper>

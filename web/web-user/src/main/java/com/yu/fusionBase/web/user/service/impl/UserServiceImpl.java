@@ -1,6 +1,7 @@
 package com.yu.fusionBase.web.user.service.impl;
 
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
+import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.yu.fusionBase.common.exception.FusionBaseException;
 import com.yu.fusionBase.common.result.ResultCodeEnum;
 import com.yu.fusionBase.common.utils.JwtUtil;
@@ -23,7 +24,7 @@ import java.util.Date;
 
 @Service
 @RequiredArgsConstructor
-public class UserServiceImpl implements UserService {
+public class UserServiceImpl extends ServiceImpl<UserMapper,User> implements UserService {
 
     private final UserMapper userMapper;
     private final CustomPasswordEncoderUtil passwordEncoder;
@@ -32,9 +33,10 @@ public class UserServiceImpl implements UserService {
     @Override
     @Transactional
     public UserVO register(UserLoginDTO dto) {
-        Long count = userMapper.selectCount(new LambdaQueryWrapper<User>()
+        Long count = lambdaQuery()
                 .eq(User::getEmail, dto.getEmail())
-                .eq(User::getIsDeleted, 0));
+                .eq(User::getIsDeleted, 0)
+                .count();
 
         if (count > 0) {
             throw new FusionBaseException(ResultCodeEnum.USER_EMAIL_EXIST);
@@ -46,8 +48,9 @@ public class UserServiceImpl implements UserService {
         user.setPasswordHash(passwordEncoder.encode(dto.getPassword()));
         user.setPassword(dto.getPassword());
         user.setUsername(dto.getEmail().split("@")[0]);
+        user.setUpdateTime(new Date());
 
-        userMapper.insert(user);
+        save(user);
         return convertToVO(user);
     }
 
@@ -74,7 +77,7 @@ public class UserServiceImpl implements UserService {
     @Override
     public UserVO getCurrentUser() {
         String userId = Util.getCurrentUserId();
-        User user = userMapper.selectById(userId);
+        User user = getById(userId);
         if (user == null || user.getIsDeleted() != 0) {
             throw new FusionBaseException(ResultCodeEnum.USER_NOT_EXIST);
         }
@@ -85,7 +88,7 @@ public class UserServiceImpl implements UserService {
     @Transactional
     public UserVO updateUser(UserVO userVO) {
         String userId = Util.getCurrentUserId();
-        User user = userMapper.selectById(userId);
+        User user = getById(userId);
         if (user == null || user.getIsDeleted() != 0) {
             throw new FusionBaseException(ResultCodeEnum.USER_NOT_EXIST);
         }
@@ -97,7 +100,7 @@ public class UserServiceImpl implements UserService {
             user.setAvatarPath(userVO.getAvatarUrl());
         }
 
-        userMapper.updateById(user);
+        updateById(user);
         return convertToVO(user);
     }
 

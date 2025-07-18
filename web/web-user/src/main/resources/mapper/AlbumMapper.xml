@@ -9,7 +9,7 @@
         from album a
         join album_share s
         on a.album_id = s.album_id
-        where s.shared_user_id = #{id}
+        where s.shared_user_id = #{userId}
           and s.is_deleted = 0
         and (s.expires_at is null or s.expires_at > NOW())
     </select>

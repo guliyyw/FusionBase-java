@@ -49,8 +49,13 @@ public class GlobalExceptionHandler {
                         e.getMessage()
                 );
 
-                // 使用日志工具记录
-                LogUtil.error(errorMsg, e);
+                if (errorType != "业务异常") {
+                    // 使用日志工具记录
+                    LogUtil.error(errorMsg, e);
+                } else {
+                    LogUtil.info(errorMsg);
+                }
+
             } else {
                 // 非Web请求场景
                 LogUtil.error(errorType + ": " + e.getMessage(), e);

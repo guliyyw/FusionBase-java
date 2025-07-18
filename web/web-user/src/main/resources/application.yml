@@ -37,6 +37,11 @@ spring:
 mybatis-plus:
   configuration:
     log-impl: org.apache.ibatis.logging.slf4j.Slf4jImpl
+    global-config:
+      db-config:
+        logic-delete-field: isDeleted  # 逻辑删除字段
+        logic-delete-value: 1          # 删除标记值
+        logic-not-delete-value: 0      # 未删除标记值
 
 minio:
   endpoint: http://127.0.0.1:9000

@@ -1,5 +1,6 @@
 package com.yu.fusionBase.web.user.custom.filter;
 
+import com.yu.fusionBase.common.exception.FusionBaseException;
 import com.yu.fusionBase.common.login.LoginUser;
 import com.yu.fusionBase.common.login.LoginUserHolder;
 import com.yu.fusionBase.common.utils.JwtUtil;
@@ -95,7 +96,6 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
             throws IOException {
         SecurityContextHolder.clearContext();
         LoginUserHolder.clear();
-        LogUtil.error("JWT验证失败: {}", e);
         response.sendError(HttpServletResponse.SC_UNAUTHORIZED, "无效的认证令牌");
     }
 }
